@@ -1,0 +1,15 @@
+version: "3.2"
+
+services:
+
+  dt-angular:
+    build:
+      context: ./dt-angular
+    ports:
+      - "4200:80"
+
+  dt-backend:
+    build:
+      context: ./dt-backend
+    ports:
+      - "8080:8080"
