@@ -1,3 +1,3 @@
-export class PriceData {
-    price!: number;
+export interface PriceData {
+    price: number;
 }

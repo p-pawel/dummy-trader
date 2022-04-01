@@ -1,7 +1,11 @@
 import {Component} from '@angular/core';
-import {Observable, tap} from "rxjs";
+import {Observable} from "rxjs";
 import {PriceData} from "../../model/priceData";
-import {PriceService} from "../../service/price.service";
+import {SseService} from "../../service/sse.service";
+import {PlaceOrderRequest} from "../../model/placeOrderRequest";
+import {PlaceOrderService} from "../../service/place-order.service";
+import {HttpErrorResponse} from "@angular/common/http";
+import {BalanceData} from "../../model/balanceData";
 
 
 @Component({
@@ -11,12 +15,35 @@ import {PriceService} from "../../service/price.service";
 })
 export class ExchangeContainerComponent {
 
-  price$: Observable<PriceData> = this.sseService
-      .getServerSentEvent();
+  price$: Observable<PriceData> = this.sseService.getPrice();
+  balance$: Observable<BalanceData> = this.sseService.getBalance();
+
+  price!: PriceData | null;
+  balance!: BalanceData | null;
+  pendingRequest: boolean = false;
 
   constructor(
-    private sseService: PriceService,
+    private sseService: SseService,
+    private placeOrderService: PlaceOrderService,
   ) {
+    this.price$.subscribe(e => this.price = e);
+    this.balance$.subscribe(e => this.balance = e);
   }
 
+  onPlaceOrder(placeOrderRequest: PlaceOrderRequest) {
+    this.pendingRequest = true;
+    this.placeOrderService.placeOrder(placeOrderRequest)
+      .subscribe(
+        {
+          next:
+            () => {
+              this.pendingRequest = false;
+            },
+          error: (error: HttpErrorResponse) => {
+            window.alert(error.error?.error);
+            this.pendingRequest = false;
+          }
+        }
+      );
+  }
 }

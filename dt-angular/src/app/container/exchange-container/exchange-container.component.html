@@ -1,1 +1,19 @@
-<app-market-info ticker="BTC/USD" [price]="price$ | async"></app-market-info>
+
+<div class="spinner-border" role="status" *ngIf="!price || !balance"></div>
+
+<div class="card" style="width: 18rem;" *ngIf="price && balance">
+
+  <div class="card-header">
+    <app-market-info ticker="BTC/USD" [price]="price"></app-market-info>
+  </div>
+  <div class="card-body">
+
+    <app-place-order-form
+      [price]="price!.price"
+      [balance]="balance!.balance"
+      [pendingRequest]="pendingRequest"
+      (placeOrder)="onPlaceOrder($event)"
+    ></app-place-order-form>
+
+  </div>
+</div>
